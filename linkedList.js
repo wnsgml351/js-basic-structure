@@ -1,55 +1,69 @@
 class LinkedList {
     length = 0;
     head = null;
+    tail = null;
 
     add(value) {
-        if (this.head) {
-            let current = this.head;
-
-            while (current.next) {
-                current = current.next;
-            }
-            current.next = new Node(value);
+        if (!this.head) {
+            const headNode = new Node(value);
+            this.head = headNode;
+            this.tail = headNode;
         } else {
-            this.head = new Node(value);
+            const addNode = new Node(value);
+            addNode.prev = this.tail;
+            this.tail.next = addNode;
+            this.tail = addNode;
         }
         this.length++;
         return this.length;
     }
 
+    testSearch(index) {
+        return {
+            prev: this.#search(index)?.prev?.value,
+            value: this.#search(index)?.value,
+            next: this.#search(index)?.next?.value,
+        };
+    }
+
     search(index) {
-        return this.#search(index)[1]?.value;
+        return this.#search(index)?.value;
     }
 
     #search(index) {
         let count = 0;
-        let prev;
         let current = this.head;
         while (count < index) {
-            prev = current;
             current = current?.next;
             count++;
         }
-        return [prev, current];
+        return current;
     }
+
     remove(index) {
-        const [prev, current] = this.#search(index);
-        if (prev && current) {
-            prev.next = current.next;
+        const current = this.#search(index);
+
+        if (current) {
+            if (current.prev) {
+                if (current.next) {
+                    current.prev.next = current.next;
+                } else {
+                    current.prev.next = null;
+                }
+            }
+
+            if (current.next) {
+                current.next.prev = current.prev;
+            }
             this.length--;
             return this.length;
-        } else if (current) {
-            this.head = current.next;
-            this.length--;
-            return this.length;
-        } else {
-            // 삭제하고자하는 대상이 없을때
         }
     }
 }
 
 class Node {
     next = null;
+    prev = null;
     constructor(value) {
         this.value = value;
     }
